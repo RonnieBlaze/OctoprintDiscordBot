@@ -81,8 +81,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.content.upper().startswith('!SCREENSHOT'):
-        urllib.request.urlretrieve(OctoRequest('screenshot'),jpgPath)
-        await client.send_file(message.channel, "d:/2.jpg")
+        urllib.request.urlretrieve(OctoRequest('screenshot'), jpgPath)
+        await client.send_file(message.channel, jpgPath)
     if message.content.upper().startswith('!JOB'):
         MyMsg = jobDef()
         await client.send_message(message.channel, MyMsg)
