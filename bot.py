@@ -38,7 +38,7 @@ def jobDef():
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s (%.2f%%).\nEstimated Print Time: %s.\nEstimated Time Left: %s```" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s (%.0f%%).\nEstimated Print Time:  %s.\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("```css\nWe are currently Not Printing111")
