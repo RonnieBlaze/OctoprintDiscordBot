@@ -38,10 +38,10 @@ def jobDef():
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print. However the estimated time left is %s" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s (%.2f%%).\nEstimated Print Time: %s.\nEstimated Time Left: %s```" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
-        mytest = ("We are currently Not Printing")
+        mytest = ("```css\nWe are currently Not Printing111")
         return (mytest)
 
 def printerDef():
@@ -51,7 +51,7 @@ def printerDef():
     bedtemptarget = printer_dict['temperature']['bed']['target']
     tooltempactual = printer_dict['temperature']['tool0']['actual']
     tooltemptarget = printer_dict['temperature']['tool0']['target']
-    mytest = ("Bed Temp %sC, Target Temp %sC, Nozzel Temp: %sC, Target Temp: %sC" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
+    mytest = ("```css\nBed Temp %sC, Target Temp %sC, \nNozzel Temp: %sC, Target Temp: %sC```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
 def convertSec(seconds):
@@ -95,5 +95,10 @@ async def on_message(message):
     if message.content.upper().startswith('!TEMPS'):
         MyMsg = printerDef()
         await client.send_message(message.channel, MyMsg)
+    if message.content.upper().startswith('!AMIADMIN'):
+        if "staff" in [role.id for role in message.author.roles]: #Replace <Role ID> with the ID of the role you want to be able to execute this command
+            await client.send_message(message.channel, "You are an admin")
+        else:
+            await client.send_message(message.channel, "You are not an admin")
 
 client.run(BotToken)
