@@ -17,6 +17,21 @@ jpgPath = ""                                                        # full path 
 Client = discord.Client() #Initialise Client 
 client = commands.Bot(command_prefix = "?") #Initialise client bot
 
+def pbar (precent):
+    print (precent)
+    if precent <= 0:
+        precent = 0
+    elif precent > 100:
+        precent = 1
+    else:
+        precent = precent / 100
+    progress = 45 * precent
+    bar = ''
+    for i in range(0,int(progress)):
+        bar += "="
+    bar = '[' + bar.ljust(45) + ']'
+    return bar
+
 def OctoRequest(RequestType):
     if RequestType == "screenshot":
         uri = "/webcam/?action=snapshot"
@@ -30,15 +45,15 @@ def OctoRequest(RequestType):
 def jobDef():
     u = urlopen(OctoRequest('jobs'))
     jobapi_dict = json.loads(u.read().decode('utf-8'))
-    filename = jobapi_dict['job']['file']['name']
+    filename = jobapi_dict['job']['file']['name'][:-6]
     printTime = jobapi_dict['progress']['printTime']
     printTimeLeft = jobapi_dict['progress']['printTimeLeft']
-    completion = jobapi_dict['progress']['completion']
+    completion = round(jobapi_dict['progress']['completion'])
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s (%.0f%%).\nEstimated Print Time:  %s.\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("```css\nWe are currently Not Printing111")
