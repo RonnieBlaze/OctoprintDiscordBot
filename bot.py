@@ -34,9 +34,14 @@ def jobDef():
     printTime = jobapi_dict['progress']['printTime']
     completion = jobapi_dict['progress']['completion']
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
+    state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
-    mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print." % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime)))
-    return (mytest)
+    if state == "Printing":
+        mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print." % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime)))
+        return (mytest)
+    if state == "Operational":
+        mytest = ("We are currently Not Printing")
+        return (mytest)
 
 def printerDef():
     u = urlopen(OctoRequest('printers'))
