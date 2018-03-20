@@ -51,7 +51,7 @@ def printerDef():
     bedtemptarget = printer_dict['temperature']['bed']['target']
     tooltempactual = printer_dict['temperature']['tool0']['actual']
     tooltemptarget = printer_dict['temperature']['tool0']['target']
-    mytest = ("```css\nBed Temp %sC, Target Temp %sC, \nNozzel Temp: %sC, Target Temp: %sC```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
+    mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
 def convertSec(seconds):
