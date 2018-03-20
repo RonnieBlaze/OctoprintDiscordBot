@@ -32,12 +32,13 @@ def jobDef():
     jobapi_dict = json.loads(u.read().decode('utf-8'))
     filename = jobapi_dict['job']['file']['name']
     printTime = jobapi_dict['progress']['printTime']
+    printTimeLeft = jobapi_dict['progress']['printTimeLeft']
     completion = jobapi_dict['progress']['completion']
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print." % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime)))
+        mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print. However the estimated time left is %s" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("We are currently Not Printing")
