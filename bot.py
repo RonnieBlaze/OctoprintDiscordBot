@@ -8,7 +8,6 @@ from urllib.request import urlopen
 import json
 
 # Variables
-#
 
 BotToken = ''           # Discord bot token
 OctoPrintUrl = ''       # Octoprints url
@@ -25,19 +24,11 @@ def octoreq(rtype):
         req = OctoPrintUrl + uri
         urllib.request.urlretrieve(req, jpgPath)
         return
+    else:
+        req = OctoPrintUrl + '/api/' + rtype + '?apikey=' + OctoPrintApiKey
+        raw = urlopen(req)
 
-    if rtype == 'jobs':
-        uri = '/api/job?apikey=%s' % OctoPrintApiKey
-
-    if rtype == 'printers':
-        uri = '/api/printer?apikey=%s' % OctoPrintApiKey
-
-    req = OctoPrintUrl + uri
-    rawdata = urlopen(req)
-    parsed = json.loads(rawdata.read().decode('utf-8'))
-    rawdata.closed()
-
-    return parsed
+    return json.loads(raw.read().decode('utf-8'))
 
 
 def jobdef():
@@ -87,6 +78,7 @@ def convertsec(seconds):
     if seconds < 60:
         seconds = round(seconds, 1)
         return '%s seconds' % (seconds)
+
 
 
 @client.event
