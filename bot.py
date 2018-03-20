@@ -17,6 +17,24 @@ jpgPath = ""                                                        # full path 
 Client = discord.Client() #Initialise Client 
 client = commands.Bot(command_prefix = "?") #Initialise client bot
 
+def pbar (precent):
+    
+  if precent <= 0:
+    precent = 0
+  elif precent > 100:
+    precent = 1
+  else:
+    precent = precent / 100
+
+  progress = 45 * precent 
+  bar = ''
+    
+  for i in range(0,int(progress)):
+    bar += '='
+  
+  bar = '[' + bar.ljust(45) + ']'
+  return bar 
+
 def OctoRequest(RequestType):
     if RequestType == "screenshot":
         uri = "/webcam/?action=snapshot"
