@@ -35,7 +35,7 @@ def jobDef():
     completion = jobapi_dict['progress']['completion']
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
     convertSec(estimatedPrintTime)
-    mytest = ("We are currently printing %s, and are %smins (%s) into a estimated %s print." % (filename,printTime,completion,convertSec(estimatedPrintTime)))
+    mytest = ("We are currently printing %s, and are %s (%.2f%%) into a estimated %s print." % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime)))
     return (mytest)
 
 def printerDef():
