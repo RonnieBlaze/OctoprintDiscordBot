@@ -95,10 +95,5 @@ async def on_message(message):
     if message.content.upper().startswith('!TEMPS'):
         MyMsg = printerDef()
         await client.send_message(message.channel, MyMsg)
-    if message.content.upper().startswith('!AMIADMIN'):
-        if "staff" in [role.id for role in message.author.roles]: #Replace <Role ID> with the ID of the role you want to be able to execute this command
-            await client.send_message(message.channel, "You are an admin")
-        else:
-            await client.send_message(message.channel, "You are not an admin")
 
 client.run(BotToken)
