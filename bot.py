@@ -55,7 +55,7 @@ def jobDef():
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertsec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("```css\nWe are currently Not Printing111")
@@ -71,7 +71,7 @@ def printerDef():
     mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
-def convertsec(seconds):
+def convertSec(seconds):
     if seconds >= 86400:
         mins, sec = divmod(seconds, 60)
         hour, mins = divmod(mins, 60)
