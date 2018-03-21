@@ -62,25 +62,64 @@ def convertsec(seconds):
         hour, mins = divmod(mins, 60)
         day, hour = divmod(hour, 24)
         day, hour = int(day), int(hour)
-        mins, sec = int(mins), round(sec, 1)
-        return '%s day %s hour %s minutes %s seconds' % (day, hour, mins, sec)
+
+        mins, sec = int(mins), int(sec)
+        if day == 1:
+            dlabel = ' day '
+        else:
+            dlabel = ' days '
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(day) + dlabel + str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
 
     if seconds >= 3600:
         mins, sec = divmod(seconds, 60)
         hour, mins = divmod(mins, 60)
         hour, mins = int(hour), int(mins)
-        sec = round(sec, 1)
-        return '%s hour %s minutes %s seconds' % (hour, mins, sec)
+
+        sec = int(sec)
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
 
     if seconds >= 60:
         mins, sec = divmod(seconds, 60)
-        mins, sec = int(mins), round(sec, 1)
-        return '%s minutes %s seconds' % (mins, sec)
+        mins, sec = int(mins), int(sec)
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(mins) + mlable + str(sec) + slabel
 
     if seconds < 60:
-        seconds = round(seconds, 1)
-        return '%s seconds' % (seconds)
-
+        seconds = int(seconds)
+        if seconds == 1:
+            return '%s second' % seconds
+        return '%s seconds' % seconds
 
 
 @client.event
