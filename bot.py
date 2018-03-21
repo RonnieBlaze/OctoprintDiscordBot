@@ -17,8 +17,10 @@ jpgPath = ""                                                        # full path 
 Client = discord.Client() #Initialise Client 
 client = commands.Bot(command_prefix = "?") #Initialise client bot
 
+Client = discord.Client() #Initialise Client 
+client = commands.Bot(command_prefix = "!") #Initialise client bot
+
 def pbar (precent):
-    print (precent)
     if precent <= 0:
         precent = 0
     elif precent > 100:
@@ -53,7 +55,7 @@ def jobDef():
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertsec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("```css\nWe are currently Not Printing111")
@@ -69,31 +71,68 @@ def printerDef():
     mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
-def convertSec(seconds):
+def convertsec(seconds):
     if seconds >= 86400:
-        min, sec = divmod(seconds,60)
-        hour, min = divmod(min, 60)
-        day,hour = divmod(hour, 24)
-        day = int(day)
-        hour = int(hour)
-        min = int(min)
-        sec = round(sec, 1)
-        return ("%s day %s hour %s minutes %s seconds" % (day,hour,min,sec))
+        mins, sec = divmod(seconds, 60)
+        hour, mins = divmod(mins, 60)
+        day, hour = divmod(hour, 24)
+        day, hour = int(day), int(hour)
+        mins, sec = int(mins), int(sec)
+        if day == 1:
+            dlabel = ' day '
+        else:
+            dlabel = ' days '
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(day) + dlabel + str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
+
     if seconds >= 3600:
-        min, sec = divmod(seconds,60)
-        hour, min = divmod(min, 60)
-        min = int(min)
-        hour = int(hour)
-        sec = round(sec, 1)
-        return  ("%s hour %s minutes %s seconds" % (hour,min,sec))
+        mins, sec = divmod(seconds, 60)
+        hour, mins = divmod(mins, 60)
+        hour, mins = int(hour), int(mins)
+        sec = int(sec)
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
+
     if seconds >= 60:
-        min, sec = divmod(seconds,60)
-        min = int(min)
-        sec = round(sec, 1)
-        return  ("%s minutes %s seconds" % (min,sec))
+        mins, sec = divmod(seconds, 60)
+        mins, sec = int(mins), int(sec)
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(mins) + mlable + str(sec) + slabel
+
     if seconds < 60:
-        seconds = round(seconds, 1)
-        return  ("%s seconds" % (seconds))
+        seconds = int(seconds)
+        if seconds == 1:
+            return '%s second' % seconds
+        return '%s seconds' % seconds
 
 @client.event 
 async def on_ready():
