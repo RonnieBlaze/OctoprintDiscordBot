@@ -14,8 +14,7 @@ BotToken = ""    # Discord bot token
 OctoPrintUrl = ""                                      # Octoprints url
 OctoPrintApiKey = ""                        # Octoprints api
 jpgPath = ""                                                        # full path to temporary screenshot i.e /tmp/screen.jpg
-Client = discord.Client() #Initialise Client 
-client = commands.Bot(command_prefix = "?") #Initialise client bot
+
 
 Client = discord.Client() #Initialise Client 
 client = commands.Bot(command_prefix = "!") #Initialise client bot
@@ -55,10 +54,10 @@ def jobDef():
     state = jobapi_dict['state']
     convertSec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s [%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s[%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
-        mytest = ("```css\nWe are currently Not Printing111")
+        mytest = ("```css\nWe are currently Not Printing```")
         return (mytest)
 
 def printerDef():
