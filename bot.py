@@ -1,11 +1,12 @@
 import discord
-from discord.ext.commands import Bot
-from discord.ext import commands
 import asyncio
 import time
 import urllib.request
-from urllib.request import urlopen
 import json
+import platform
+from discord.ext.commands import Bot
+from discord.ext import commands
+from urllib.request import urlopen
 
 # Variables
 #
@@ -14,10 +15,34 @@ BotToken = ""    # Discord bot token
 OctoPrintUrl = ""                                      # Octoprints url
 OctoPrintApiKey = ""                        # Octoprints api
 jpgPath = ""                                                        # full path to temporary screenshot i.e /tmp/screen.jpg
-
+channel = discord.Object(id='')                           # Channel Id you want the bot to reply in
 
 Client = discord.Client() #Initialise Client 
 client = commands.Bot(command_prefix = "!") #Initialise client bot
+
+#async def my_background_task():
+#    await client.wait_until_ready()
+#    counter = 0
+#    while not client.is_closed:
+#        counter += 1
+#        await client.send_message(channel, counter)
+#        await asyncio.sleep(60) # task runs every 60 seconds
+
+@client.event 
+async def on_ready():
+    print('Logged in as '+client.user.name+' (ID:'+client.user.id+') | Connected to '+str(len(client.servers))+' servers | Connected to '+str(len(set(client.get_all_members())))+' users')
+    print('--------')
+    print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
+    print('--------')
+    print('Use this link to invite {}:'.format(client.user.name))
+    print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(client.user.id))
+    print('--------')
+    print('Support Discord Server: ')
+    print('Github Link: https://github.com/RonnieBlaze/OctoprintDiscordBot')
+    print('--------')
+    print('You are running ') #Do not change this. This will really help us support you, if you need support.
+    print('Created by ')
+    return await client.change_presence(game=discord.Game(name='Idle')) #This is buggy, let us know if it doesn't work.
 
 def pbar (precent):
     if precent <= 0:
@@ -52,9 +77,9 @@ def jobDef():
     completion = round(jobapi_dict['progress']['completion'])
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
     state = jobapi_dict['state']
-    convertSec(estimatedPrintTime)
+    convertsec(estimatedPrintTime)
     if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s[%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),pbar(completion),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
+        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s[%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertsec(printTime),pbar(completion),completion,convertsec(estimatedPrintTime),convertsec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
         mytest = ("```css\nWe are currently Not Printing```")
@@ -70,7 +95,7 @@ def printerDef():
     mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
-def convertSec(seconds):
+def convertsec(seconds):
     if seconds >= 86400:
         mins, sec = divmod(seconds, 60)
         hour, mins = divmod(mins, 60)
@@ -133,20 +158,20 @@ def convertSec(seconds):
             return '%s second' % seconds
         return '%s seconds' % seconds
 
-@client.event 
-async def on_ready():
-    print("Bot is online and connected to Discord")
-
 @client.event
 async def on_message(message):
-    if message.content.upper().startswith('!SCREENSHOT'):
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return
+    if message.content.startswith('!screenshot'):
         urllib.request.urlretrieve(OctoRequest('screenshot'), jpgPath)
-        await client.send_file(message.channel, jpgPath)
-    if message.content.upper().startswith('!JOB'):
+        await client.send_file(channel, jpgPath)
+    if message.content.startswith('!job'):
         MyMsg = jobDef()
-        await client.send_message(message.channel, MyMsg)
-    if message.content.upper().startswith('!TEMPS'):
+        await client.send_message(channel, MyMsg)
+    if message.content.startswith('!temps'):
         MyMsg = printerDef()
-        await client.send_message(message.channel, MyMsg)
+        await client.send_message(channel, MyMsg)
 
+#client.loop.create_task(my_background_task())
 client.run(BotToken)
