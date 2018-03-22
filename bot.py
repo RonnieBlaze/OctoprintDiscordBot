@@ -3,19 +3,29 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 import asyncio
 import time
+
 import urllib.request
 from urllib.request import urlopen
 import json
-
-# Variables
-
-BotToken = ''           # Discord bot token
-OctoPrintUrl = ''       # Octoprints url
-OctoPrintApiKey = ''    # Octoprints api
-jpgPath = ''            # full path to temporary screenshot i.e /tmp/screen.jpg
+import configparser
 
 Client = discord.Client()  # Initialise Client
 client = commands.Bot(command_prefix='?')  # Initialise client bot
+
+
+def load_cfg():
+    global BotToken
+    global OctoPrintUrl
+    global OctoPrintApiKey
+    global jpgPath
+
+    cfg = configparser.ConfigParser()
+    cfg.read('config.cfg')
+
+    OctoPrintUrl = cfg.get('setting', 'url')
+    OctoPrintApiKey = cfg.get('setting', 'apikey')
+    BotToken = cfg.get('setting', 'bot_token')
+    jpgPath = cfg.get('setting', 'jpg_path')
 
 
 def octoreq(rtype):
@@ -32,7 +42,7 @@ def octoreq(rtype):
 
 
 def jobdef():
-    jobapi_dict = octoreq('jobs')
+    jobapi_dict = octoreq('job')
     fname = jobapi_dict['job']['file']['name']
     ptime = jobapi_dict['progress']['printTime']
     completion = jobapi_dict['progress']['completion']
@@ -49,7 +59,7 @@ def printerdef():
     bedtemptarget = printer_dict['temperature']['bed']['target']
     tooltempactual = printer_dict['temperature']['tool0']['actual']
     tooltemptarget = printer_dict['temperature']['tool0']['target']
-    
+
     mytest = ('Bed Temp %sC, Target Temp %sC, Nozzel Temp: %sC, Target Bed Temp: %sC' % (bedtempactual, bedtemptarget,
                                                                                          tooltempactual, tooltemptarget)
               )
@@ -121,6 +131,8 @@ def convertsec(seconds):
             return '%s second' % seconds
         return '%s seconds' % seconds
 
+load_cfg()
+print(jobdef())
 
 @client.event
 async def on_ready():
