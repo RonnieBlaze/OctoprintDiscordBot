@@ -8,110 +8,136 @@ from urllib.request import urlopen
 import json
 
 # Variables
-#
 
-BotToken = ""    # Discord bot token
-OctoPrintUrl = ""                                      # Octoprints url
-OctoPrintApiKey = ""                        # Octoprints api
-jpgPath = ""                                                        # full path to temporary screenshot i.e /tmp/screen.jpg
-Client = discord.Client() #Initialise Client 
-client = commands.Bot(command_prefix = "?") #Initialise client bot
+BotToken = ''           # Discord bot token
+OctoPrintUrl = ''       # Octoprints url
+OctoPrintApiKey = ''    # Octoprints api
+jpgPath = ''            # full path to temporary screenshot i.e /tmp/screen.jpg
 
-def pbar (precent):
-    
-  if precent <= 0:
-    precent = 0
-  elif precent > 100:
-    precent = 1
-  else:
-    precent = precent / 100
+Client = discord.Client()  # Initialise Client
+client = commands.Bot(command_prefix='?')  # Initialise client bot
 
-  progress = 45 * precent 
-  bar = ''
-    
-  for i in range(0,int(progress)):
-    bar += '='
-  
-  bar = '[' + bar.ljust(45) + ']'
-  return bar 
 
-def OctoRequest(RequestType):
-    if RequestType == "screenshot":
-        uri = "/webcam/?action=snapshot"
-    if RequestType == "jobs":
-        uri = "/api/job?apikey=%s" % (OctoPrintApiKey)
-    if RequestType == "printers":
-        uri = "/api/printer?apikey=%s" % (OctoPrintApiKey)
-    url = OctoPrintUrl + uri
-    return url
+def octoreq(rtype):
+    if rtype == 'screenshot':
+        uri = '/webcam/?action=snapshot'
+        req = OctoPrintUrl + uri
+        urllib.request.urlretrieve(req, jpgPath)
+        return
+    else:
+        req = OctoPrintUrl + '/api/' + rtype + '?apikey=' + OctoPrintApiKey
+        raw = urlopen(req)
 
-def jobDef():
-    u = urlopen(OctoRequest('jobs'))
-    jobapi_dict = json.loads(u.read().decode('utf-8'))
-    filename = jobapi_dict['job']['file']['name']
-    printTime = jobapi_dict['progress']['printTime']
-    printTimeLeft = jobapi_dict['progress']['printTimeLeft']
+    return json.loads(raw.read().decode('utf-8'))
+
+
+def jobdef():
+    jobapi_dict = octoreq('jobs')
+    fname = jobapi_dict['job']['file']['name']
+    ptime = jobapi_dict['progress']['printTime']
     completion = jobapi_dict['progress']['completion']
-    estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
-    state = jobapi_dict['state']
-    convertSec(estimatedPrintTime)
-    if state == "Printing":
-        mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s (%.0f%%).\nEstimated Print Time:  %s.\nEstimated Time Left:   %s```" % (filename,convertSec(printTime),completion,convertSec(estimatedPrintTime),convertSec(printTimeLeft)))
-        return (mytest)
-    if state == "Operational":
-        mytest = ("```css\nWe are currently Not Printing111")
-        return (mytest)
+    eptime = convertsec(jobapi_dict['job']['estimatedPrintTime'])
+    mytest = ('We are currently printing %s, and are %s mins (%s) into a estimated %s print.' % (fname, ptime,
+                                                                                                 completion, eptime))
+    return mytest
 
-def printerDef():
-    u = urlopen(OctoRequest('printers'))
-    printer_dict = json.loads(u.read().decode('utf-8'))
+
+def printerdef():
+    printer_dict = octoreq('printers')
+
     bedtempactual = printer_dict['temperature']['bed']['actual']
     bedtemptarget = printer_dict['temperature']['bed']['target']
     tooltempactual = printer_dict['temperature']['tool0']['actual']
     tooltemptarget = printer_dict['temperature']['tool0']['target']
-    mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
-    return (mytest)
+    
+    mytest = ('Bed Temp %sC, Target Temp %sC, Nozzel Temp: %sC, Target Bed Temp: %sC' % (bedtempactual, bedtemptarget,
+                                                                                         tooltempactual, tooltemptarget)
+              )
+    return mytest
 
-def convertSec(seconds):
+
+def convertsec(seconds):
     if seconds >= 86400:
-        min, sec = divmod(seconds,60)
-        hour, min = divmod(min, 60)
-        day,hour = divmod(hour, 24)
-        day = int(day)
-        hour = int(hour)
-        min = int(min)
-        sec = round(sec, 1)
-        return ("%s day %s hour %s minutes %s seconds" % (day,hour,min,sec))
-    if seconds >= 3600:
-        min, sec = divmod(seconds,60)
-        hour, min = divmod(min, 60)
-        min = int(min)
-        hour = int(hour)
-        sec = round(sec, 1)
-        return  ("%s hour %s minutes %s seconds" % (hour,min,sec))
-    if seconds >= 60:
-        min, sec = divmod(seconds,60)
-        min = int(min)
-        sec = round(sec, 1)
-        return  ("%s minutes %s seconds" % (min,sec))
-    if seconds < 60:
-        seconds = round(seconds, 1)
-        return  ("%s seconds" % (seconds))
+        mins, sec = divmod(seconds, 60)
+        hour, mins = divmod(mins, 60)
+        day, hour = divmod(hour, 24)
+        day, hour = int(day), int(hour)
 
-@client.event 
+        mins, sec = int(mins), int(sec)
+        if day == 1:
+            dlabel = ' day '
+        else:
+            dlabel = ' days '
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(day) + dlabel + str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
+
+    if seconds >= 3600:
+        mins, sec = divmod(seconds, 60)
+        hour, mins = divmod(mins, 60)
+        hour, mins = int(hour), int(mins)
+
+        sec = int(sec)
+        if hour == 1:
+            hlabel = ' hour '
+        else:
+            hlabel = ' hours '
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(hour) + hlabel + str(mins) + mlable + str(sec) + slabel
+
+    if seconds >= 60:
+        mins, sec = divmod(seconds, 60)
+        mins, sec = int(mins), int(sec)
+        if mins == 1:
+            mlable = ' minute '
+        else:
+            mlable = ' minutes '
+        if sec == 1:
+            slabel = ' second'
+        else:
+            slabel = ' seconds'
+        return str(mins) + mlable + str(sec) + slabel
+
+    if seconds < 60:
+        seconds = int(seconds)
+        if seconds == 1:
+            return '%s second' % seconds
+        return '%s seconds' % seconds
+
+
+@client.event
 async def on_ready():
-    print("Bot is online and connected to Discord")
+    print('Bot is online and connected to Discord')
+
 
 @client.event
 async def on_message(message):
     if message.content.upper().startswith('!SCREENSHOT'):
-        urllib.request.urlretrieve(OctoRequest('screenshot'), jpgPath)
+        octoreq('screenshot')
         await client.send_file(message.channel, jpgPath)
     if message.content.upper().startswith('!JOB'):
-        MyMsg = jobDef()
+        MyMsg = jobdef()
         await client.send_message(message.channel, MyMsg)
     if message.content.upper().startswith('!TEMPS'):
-        MyMsg = printerDef()
+        MyMsg = printerdef()
         await client.send_message(message.channel, MyMsg)
+
 
 client.run(BotToken)
