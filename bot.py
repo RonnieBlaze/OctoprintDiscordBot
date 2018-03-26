@@ -17,7 +17,7 @@ OctoPrintApiKey = ""                        # Octoprints api
 jpgPath = ""                                                        # full path to temporary screenshot i.e /tmp/screen.jpg
 channel = discord.Object(id='')                           # Channel Id you want the bot to reply in
 
-Client = discord.Client() #Initialise Client 
+Client = discord.Client()                   #Initialise Client 
 client = commands.Bot(command_prefix = "!") #Initialise client bot
 
 #async def my_background_task():
@@ -42,7 +42,7 @@ async def on_ready():
     print('--------')
     print('You are running ') #Do not change this. This will really help us support you, if you need support.
     print('Created by ')
-    return await client.change_presence(game=discord.Game(name='Idle')) #This is buggy, let us know if it doesn't work.
+    await client.change_presence(game=discord.Game(name='Started')) #This is buggy, let us know if it doesn't work.
 
 def pbar (precent):
     if precent <= 0:
@@ -74,10 +74,10 @@ def jobDef():
     filename = jobapi_dict['job']['file']['name'][:-6]
     printTime = jobapi_dict['progress']['printTime']
     printTimeLeft = jobapi_dict['progress']['printTimeLeft']
-    completion = round(jobapi_dict['progress']['completion'])
     estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
-    state = jobapi_dict['state']
+    completion = jobapi_dict['progress']['completion']
     convertsec(estimatedPrintTime)
+    state = jobapi_dict['state']
     if state == "Printing":
         mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s[%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertsec(printTime),pbar(completion),completion,convertsec(estimatedPrintTime),convertsec(printTimeLeft)))
         return (mytest)
