@@ -71,14 +71,14 @@ def OctoRequest(RequestType):
 def jobDef():
     u = urlopen(OctoRequest('jobs'))
     jobapi_dict = json.loads(u.read().decode('utf-8'))
-    filename = jobapi_dict['job']['file']['name'][:-6]
-    printTime = jobapi_dict['progress']['printTime']
-    printTimeLeft = jobapi_dict['progress']['printTimeLeft']
-    estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
-    completion = jobapi_dict['progress']['completion']
-    convertsec(estimatedPrintTime)
     state = jobapi_dict['state']
     if state == "Printing":
+        filename = jobapi_dict['job']['file']['name'][:-6]
+        printTime = jobapi_dict['progress']['printTime']
+        printTimeLeft = jobapi_dict['progress']['printTimeLeft']
+        estimatedPrintTime = jobapi_dict['job']['estimatedPrintTime']
+        completion = jobapi_dict['progress']['completion']
+        convertsec(estimatedPrintTime)
         mytest = ("```css\nWe are currently printing %s\nElapsed Printing Time: %s\n%s[%.0f%%]\nEstimated Print Time:  %s\nEstimated Time Left:   %s```" % (filename,convertsec(printTime),pbar(completion),completion,convertsec(estimatedPrintTime),convertsec(printTimeLeft)))
         return (mytest)
     if state == "Operational":
