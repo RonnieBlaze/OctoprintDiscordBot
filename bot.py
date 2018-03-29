@@ -28,45 +28,96 @@ def load_cfg():
     jpgPath = cfg.get('setting', 'jpg_path')
 
 
-def octoreq(rtype):
-    if rtype == 'screenshot':
+def progress_bar (percent):
+    if percent <= 0:
+        percent = 0
+    elif percent > 100:
+        percent = 1
+    else:
+        percent = percent / 100
+    progress = 45 * percent
+    bar = ''
+    for i in range(0, int(progress)):
+        bar += "="
+    bar = '[' + bar.ljust(45) + ']  ' + '%.0f%%' % (percent * 100)
+    return bar
+
+
+def api_call(request_type):
+
+    if request_type == 'screenshot':
         uri = '/webcam/?action=snapshot'
         req = OctoPrintUrl + uri
-        urllib.request.urlretrieve(req, jpgPath)
-        return
-    else:
-        req = OctoPrintUrl + '/api/' + rtype + '?apikey=' + OctoPrintApiKey
-        raw = urlopen(req)
 
+        try:
+            urllib.request.urlretrieve(req, jpgPath)
+        except urllib.request.HTTPError as e:
+            print('Http Error')
+            print('Error code: ', e.code)
+        except urllib.request.URLError as e:
+            print('URL Error')
+            print('Reason: ', e.reason)
+
+        return
+
+    else:
+        req = OctoPrintUrl + '/api/' + request_type + '?apikey=' + OctoPrintApiKey
+        try:
+            raw = urlopen(req)
+        except urllib.request.HTTPError as e:
+            print('Http Error')
+            print('Error code: ', e.code)
+            return -1
+        except urllib.request.URLError as e:
+            print('URL Error')
+            print('Reason: ', e.reason)
+            return -1
     return json.loads(raw.read().decode('utf-8'))
 
 
-def jobdef():
-    jobapi_dict = octoreq('job')
-    fname = jobapi_dict['job']['file']['name']
-    ptime = jobapi_dict['progress']['printTime']
-    completion = jobapi_dict['progress']['completion']
-    eptime = convertsec(jobapi_dict['job']['estimatedPrintTime'])
-    mytest = ('We are currently printing %s, and are %s mins (%s) into a estimated %s print.' % (fname, ptime,
-                                                                                                 completion, eptime))
-    return mytest
+def get_jobs():
+    response = api_call('jobs')
+
+    if response == -1:
+        status = 'Error retrieving data'
+        return status
+
+    if response['state'] != 'Printing':
+        status = ('```css\n'
+                  'We are currently not printing')
+        return status
+
+    status = ['```css',
+              'We are currently printing ' + response['job']['file']['name'][:-6],
+              'Elapsed Printing Time: ' + convert_sec(response['progress']['printTime']),
+              progress_bar(response['progress']['completion']),
+              'Estimated Time Left: ' + convert_sec(response['job']['estimatedPrintTime']),
+              '```']
+
+    return '\n'.join(status)
 
 
-def printerdef():
-    printer_dict = octoreq('printers')
+def get_printers():
+    response = api_call('printers')
 
-    bedtempactual = printer_dict['temperature']['bed']['actual']
-    bedtemptarget = printer_dict['temperature']['bed']['target']
-    tooltempactual = printer_dict['temperature']['tool0']['actual']
-    tooltemptarget = printer_dict['temperature']['tool0']['target']
+    if response == -1:
+        status = 'Error retrieving data'
+        return status
 
-    mytest = ('Bed Temp %sC, Target Temp %sC, Nozzel Temp: %sC, Target Bed Temp: %sC' % (bedtempactual, bedtemptarget,
-                                                                                         tooltempactual, tooltemptarget)
-              )
-    return mytest
+    status = ['```css',
+              '   Bed Temp: ' + str(response['temperature']['bed']['actual']) + '°C',
+              'Target Temp: ' + str(response['temperature']['bed']['target']) + '°C',
+              '¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯',
+              '',
+              'Nozzle Temp: ' + str(response['temperature']['tool0']['actual']) + '°C',
+              'Target Temp: ' + str(response['temperature']['tool0']['target']) + '°C',
+              '¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯',
+              '```']
+
+    return '\n'.join(status)
 
 
-def convertsec(seconds):
+def convert_sec(seconds):
     if seconds >= 86400:
         mins, sec = divmod(seconds, 60)
         hour, mins = divmod(mins, 60)
@@ -131,8 +182,6 @@ def convertsec(seconds):
             return '%s second' % seconds
         return '%s seconds' % seconds
 
-load_cfg()
-print(jobdef())
 
 @client.event
 async def on_ready():
@@ -151,5 +200,7 @@ async def on_message(message):
         MyMsg = printerdef()
         await client.send_message(message.channel, MyMsg)
 
+
+load_cfg()
 
 client.run(BotToken)
