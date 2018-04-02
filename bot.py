@@ -191,13 +191,13 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.content.upper().startswith('!SCREENSHOT'):
-        octoreq('screenshot')
+        api_call('screenshot')
         await client.send_file(message.channel, jpgPath)
     if message.content.upper().startswith('!JOB'):
-        MyMsg = jobdef()
+        MyMsg = get_jobs()
         await client.send_message(message.channel, MyMsg)
     if message.content.upper().startswith('!TEMPS'):
-        MyMsg = printerdef()
+        MyMsg = get_printers()
         await client.send_message(message.channel, MyMsg)
 
 
