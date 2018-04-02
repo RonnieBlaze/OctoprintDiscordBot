@@ -45,17 +45,17 @@ async def on_ready():
     await client.change_presence(game=discord.Game(name='Started')) #This is buggy, let us know if it doesn't work.
 
 def pbar (precent):
-    if precent <= 0:
-        precent = 0
-    elif precent > 100:
-        precent = 1
+    if percent <= 0:
+        percent = 0
+    elif percent > 100:
+        percent = 1
     else:
-        precent = precent / 100
-    progress = 45 * precent
+        percent = percent / 100
+    progress = 45 * percent
     bar = ''
-    for i in range(0,int(progress)):
+    for i in range(0, int(progress)):
         bar += "="
-    bar = '[' + bar.ljust(45) + ']'
+    bar = '[' + bar.ljust(45) + ']  ' + '%.0f%%' % (percent * 100)
     return bar
 
 def OctoRequest(RequestType):
@@ -92,7 +92,7 @@ def printerDef():
     bedtemptarget = printer_dict['temperature']['bed']['target']
     tooltempactual = printer_dict['temperature']['tool0']['actual']
     tooltemptarget = printer_dict['temperature']['tool0']['target']
-    mytest = ("```css\nBed Temp       (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
+    mytest = ("```css\nBed Temp:  (%sC\%sC)\nNozzel Temp: (%sC\%sC)```" % (bedtempactual,bedtemptarget,tooltempactual,tooltemptarget))
     return (mytest)
 
 def convertsec(seconds):
