@@ -19,7 +19,8 @@ def load_cfg():
     global OctoPrintUrl
     global OctoPrintApiKey
     global jpgPath
-
+    global channel
+    
     cfg = configparser.ConfigParser()
     cfg.read('config.cfg')
 
@@ -27,6 +28,7 @@ def load_cfg():
     OctoPrintApiKey = cfg.get('setting', 'apikey')
     BotToken = cfg.get('setting', 'bot_token')
     jpgPath = cfg.get('setting', 'jpg_path')
+    channel = cfg.get('setting', 'channel')
 
 
 def progress_bar (percent):
