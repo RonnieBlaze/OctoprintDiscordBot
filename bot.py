@@ -79,15 +79,14 @@ def api_call(request_type):
 
 
 def get_jobs():
-    response = api_call('jobs')
+    response = api_call('job')
 
     if response == -1:
         status = 'Error retrieving data'
         return status
 
     if response['state'] != 'Printing':
-        status = ('```css\n'
-                  'We are currently not printing')
+        status = ("```css\nWe are currently Not Printing```")
         return status
 
     status = ['```css',
@@ -101,7 +100,7 @@ def get_jobs():
 
 
 def get_printers():
-    response = api_call('printers')
+    response = api_call('printer')
 
     if response == -1:
         status = 'Error retrieving data'
